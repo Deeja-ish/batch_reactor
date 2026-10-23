@@ -1,0 +1,4 @@
+data/raw
+data/processed
+.env
+__pycache__/
