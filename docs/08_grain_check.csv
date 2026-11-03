@@ -1,0 +1,2 @@
+total_raw_rows,total_deduped_rows,exact_duplicate_rows_removed,total_batches,avg_rows_per_batch,min_rows_per_batch,max_rows_per_batch,max_distinct_yields_per_batch,min_batch_yield,max_batch_yield
+2009978,1999980,9998,11111,180.0,180,180,1,0.0,97.30271750430667

@@ -67,8 +67,14 @@
 *   Missing: 85292 nulls (4.24%) no negetive values 
 *   Issue: None.  All ph seem from the data ranges from 6-7 and stays within this range through out
 
-**11. ambient_humidity**
+**12. ambient_humidity**
 *   Meaning: Tha amount of water or vapour present in the surroung air per every minute of the process for every batch.
 *   Raw: Float values
 *   Missing: No missing value
 *   Issue: None. The values in this colum ranges form 20-90.
+
+**13. yield_pct**
+*   Meaning: The target value for the prediction in percentage %. This tell us about the final products obtained from the reaction
+*   Raw: Float values
+*   Missing: No missing value
+*   Issue: None. The values in this colum ranges form 0 - 97.32.
