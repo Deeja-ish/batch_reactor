@@ -564,3 +564,24 @@ To prevent target leakage from `yield_pct` being repeated across ~180 minute-lev
 - **Medium confidence:** Crew-rotation interpretation of the 4 operator shifts (`A`, `B`, `C`, `Night`), and rejection of the RPM zero-point drift hypothesis (since 145 of 148 negative RPM values are large glitches $< -2\text{ RPM}$ and only 3 values lie in $[-2, 0]$).
 - **Low confidence / Not proven:** Batch-mode unit recovery (56.68% accuracy is insufficient for minority units in the 20% null subset without range-based unit inference), and Missing Completely at Random (MCAR) assumptions given the 12.83% multi-minute dropout streaks and end-of-batch missingness spike.
 - **Limitations:** Without external plant logs or a physical process specification sheet, we cannot resolve why a single reactor logs multiple concurrent batches (515,430 overlapping reactor-minutes) or definitively distinguish between genuine extreme pressure/temperature spikes and unlabelled `kPa`/`psi`/`Kelvin` rows among the 20% missing unit records.
+
+
+Yield Exactly 0: You found exactly 93 batches that have a yield_pct of 0.0. Since all 93 batches contain exactly 180 rows, they were not aborted early; they went through the full 3-hour process but produced nothing (likely a catastrophic chemical failure or unrecorded washout).Time Stability: Based on your line chart, the average values for temp_c, pressure_bar, yield_pct, agitator_rpm, and feed_rate remain steady across the measured months.   Reactor Hardware Consistency: Based on your bar chart, the average process variables are virtually identical across all 8 reactors (R1 through R8).   
+Missingness Totals: 
+batch_id,0
+timestamp,0
+reactor_id,0
+temp_c,89677
+pressure_bar,88107
+agitator_rpm,77035
+feed_rate,85971
+feed_purity,0
+catalyst_lot,0
+ph,84856
+operator_shift,0
+ambient_humidity,0
+yield_pct,0
+temp_unit,0
+pressure_unit,0
+temperature_group,89677
+month,0
