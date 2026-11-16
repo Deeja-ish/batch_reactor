@@ -74,7 +74,7 @@ def test_temperature_unit_fill():
         "temp_unit" : [None, None, None]
     })
     cleaned_df = fill_temp_unit(temperature_data)
-    assert cleaned_df['temp_unit'] is not None
+    assert cleaned_df['temp_unit'].to_list() == ['°C', '°F', "K"]
 
 
 # test the cleaning of the raw data
@@ -82,8 +82,8 @@ def test_values_and_units():
     raw_data = pd.DataFrame({
         'pressure_unit': ['psi', 'kPa', 'barg'],
         'pressure_bar': [14.50377, 100.0, 2.0],
-        'temp_unit': ['°F', 'Kelvin', '°C'],
-        'temp_c': [212.0, 373.15, 100.0]
+        'temp_c': [212.0, 373.15, 100.0],
+        'temp_unit': ['°F', 'Kelvin', '°C']
     })
 
     cleaned_data = clean_temp_pressure(raw_data)

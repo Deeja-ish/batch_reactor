@@ -3,7 +3,7 @@ batch_id,0
 timestamp,0
 reactor_id,0
 temp_c,89677
-pressure_bar,88107
+pressure_bar,88017
 agitator_rpm,77035
 feed_rate,85971
 feed_purity,0
@@ -14,5 +14,4 @@ ambient_humidity,0
 yield_pct,0
 temp_unit,0
 pressure_unit,0
-temperature_group,89677
 month,0

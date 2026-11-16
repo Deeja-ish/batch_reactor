@@ -109,4 +109,4 @@ def clean_outliers(data):
     agitation_outliers = (data['agitator_rpm'] < 0)
     data.loc[agitation_outliers, 'agitator_rpm'] = np.nan
 
-    return data
+    return data 
