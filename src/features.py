@@ -10,7 +10,7 @@ def get_quantille_90(x):
     return x.quantile(0.95)
 SENSOR = ['temp_c', "pressure_bar", "agitator_rpm", "feed_rate", 'ph']
 STATS = ["min", 'max', "std", "mean", fraction_unknow, get_quantille_05, get_quantille_90]
-BATCH_COLUMNS = ['catalyst_lot', "reactor_id", "feed_purity", "operator_shift", "ambient_humidity"]
+BATCH_COLUMNS = ['catalyst_lot', "reactor_id", "feed_purity", "operator_shift", "ambient_humidity", "temp_unit", "pressure_unit"]
 MIN_READINGS= 10
 
 # create the features column
