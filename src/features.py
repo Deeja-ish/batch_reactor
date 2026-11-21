@@ -36,9 +36,6 @@ def validate_readings(data):
         raise ValueError("Incomplete column")
     if len(data) < MIN_READINGS:
         raise ValueError("Batch has too few readings")
-    for col in BATCH_COLUMNS:
-        if data[col].nunique() != 1:
-            raise ValueError("Batch col must be constant")
     
     return data
 

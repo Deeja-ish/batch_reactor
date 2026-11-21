@@ -1,6 +1,6 @@
 from fastapi import Request, APIRouter, HTTPException, status
 from src.features import build_batch_features
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 import pandas as pd
 from datetime import datetime
 
@@ -38,8 +38,8 @@ class InputFeatures(BaseModel):
     temp_unit : str
     pressure_unit : str
     timestamp : datetime
-    ambient_humidity : str 
-    batch_id : str
+    ambient_humidity : float
+    batch_id : int
     operator_shift : str
 
 
@@ -61,13 +61,13 @@ async def get_predict(data: list[InputFeatures], request: Request) -> dict:
                 detail= str(e)
             )
 
-        extract_features = clean_data.drop(columns=["temp_c_fraction_unknow", "pressure_bar_fraction_unknow", "feed_rate_fraction_unknow", "ph_fraction_unknow", "agitator_rpm_fraction_unknow", "batch_start", "batch_id", "timestamp"])
+        extract_features = clean_data.drop(columns=["temp_c_fraction_unknow", "pressure_bar_fraction_unknow", "feed_rate_fraction_unknow", "ph_fraction_unknow", "agitator_rpm_fraction_unknow", "batch_start"])
         prediction = model.predict(extract_features)[0]
         round_prediction = round(prediction, 2)
 
         return {
             "status" : "success",
-            "prediction" : round_prediction
+            "prediction" : float(round_prediction)
         }
     except HTTPException:
         raise 

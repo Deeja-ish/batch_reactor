@@ -2,3 +2,4 @@ data/raw
 data/processed
 .env
 __pycache__/
+.pytest_cache
