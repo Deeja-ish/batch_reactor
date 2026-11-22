@@ -1,4 +1,9 @@
 from .cleaning import clean_reactor, clean_operator, clean_lot_name, clean_outliers, clean_temp_pressure, clean_unit_name, fill_pressure_unit, fill_temp_unit, remove_duplicates
+
+# create the cleaning function 
+class InvalidError(ValueError):
+    pass;
+
 # write the cleaning function 
 def fraction_unknow(x):
     return x.isna().mean()
@@ -11,7 +16,42 @@ def get_quantille_90(x):
 SENSOR = ['temp_c', "pressure_bar", "agitator_rpm", "feed_rate", 'ph']
 STATS = ["min", 'max', "std", "mean", fraction_unknow, get_quantille_05, get_quantille_90]
 BATCH_COLUMNS = ['catalyst_lot', "reactor_id", "feed_purity", "operator_shift", "ambient_humidity", "temp_unit", "pressure_unit"]
-MIN_READINGS= 10
+MIN_READINGS= 160
+MODEL_FEATURES = ['reactor_id',
+ 'operator_shift',
+ 'feed_purity',
+ 'catalyst_lot',
+ 'ambient_humidity',
+ 'temp_c_mean',
+ 'temp_c_std',
+ 'temp_c_min',
+ 'temp_c_max',
+ 'temp_c_get_quantille_05',
+ 'temp_c_get_quantille_90',
+ 'pressure_bar_mean',
+ 'pressure_bar_std',
+ 'pressure_bar_min',
+ 'pressure_bar_max',
+ 'pressure_bar_get_quantille_05',
+ 'pressure_bar_get_quantille_90',
+ 'agitator_rpm_mean',
+ 'agitator_rpm_std',
+ 'agitator_rpm_min',
+ 'agitator_rpm_max',
+ 'agitator_rpm_get_quantille_05',
+ 'agitator_rpm_get_quantille_90',
+ 'feed_rate_mean',
+ 'feed_rate_std',
+ 'feed_rate_min',
+ 'feed_rate_max',
+ 'feed_rate_get_quantille_05',
+ 'feed_rate_get_quantille_90',
+ 'ph_mean',
+ 'ph_std',
+ 'ph_min',
+ 'ph_max',
+ 'ph_get_quantille_05',
+ 'ph_get_quantille_90']
 
 # create the features column
 FEATURE_COLUMNS = []
@@ -33,10 +73,11 @@ def validate_readings(data):
 
     missing_cols = expected_cols - incoming_cols
     if missing_cols:
-        raise ValueError("Incomplete column")
+        raise InvalidError("Incomplete column")
     if len(data) < MIN_READINGS:
-        raise ValueError("Batch has too few readings")
-    
+        raise InvalidError("Batch has too few readings")
+    if data['batch_id'].nunique() != 1:
+        raise InvalidError("The Batch id must be unique")
     return data
 
 # the master cleaning function

@@ -1,10 +1,14 @@
 from fastapi import Request, APIRouter, HTTPException, status
-from src.features import build_batch_features
-from pydantic import BaseModel
 import pandas as pd
-from datetime import datetime
+from src.features import(
+    MODEL_FEATURES, build_batch_features, SENSOR, InvalidError
+)
+from .schemas import InputFeatures, ResponseModel
+import logging
 
+logger = logging.getLogger(__name__)
 router = APIRouter()
+MODEL_VERSION = "1.0.0"
 
 # define the health check route
 @router.get("/health", status_code=status.HTTP_200_OK)
@@ -25,53 +29,54 @@ async def get_health(request: Request):
         "preprocessing_loaded" : True
     }
 
-# create the basemodel
-class InputFeatures(BaseModel):
-    temp_c : float
-    pressure_bar : float
-    agitator_rpm : float
-    ph : float 
-    feed_rate : float 
-    catalyst_lot : str
-    reactor_id : str 
-    feed_purity : float
-    temp_unit : str
-    pressure_unit : str
-    timestamp : datetime
-    ambient_humidity : float
-    batch_id : int
-    operator_shift : str
-
-
 # create the expected file
-@router.post("/predict", status_code=status.HTTP_200_OK)
-async def get_predict(data: list[InputFeatures], request: Request) -> dict:
+@router.post("/predict", response_model= ResponseModel, status_code=status.HTTP_200_OK)
+def get_predict(data: list[InputFeatures], request: Request) -> dict:
+    
+
+    model = getattr(request.app.state, "model", None)
+    if model is None:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+             detail= "Model is unavailable"
+        )
+
     try:
-
-        model = getattr(request.app.state, "model")
-
         features = [row.model_dump() for row in data ]
         dataframe = pd.DataFrame(features)
+        clean_data = build_batch_features(dataframe)
+            
+        exact_features = clean_data[MODEL_FEATURES]
+        prediction = float(model.predict(exact_features)[0])
 
-        try:
-            clean_data = build_batch_features(dataframe)
-        except Exception as e:
-            raise HTTPException(
-                status_code = status.HTTP_400_BAD_REQUEST,
-                detail= str(e)
-            )
-
-        extract_features = clean_data.drop(columns=["temp_c_fraction_unknow", "pressure_bar_fraction_unknow", "feed_rate_fraction_unknow", "ph_fraction_unknow", "agitator_rpm_fraction_unknow", "batch_start"])
-        prediction = model.predict(extract_features)[0]
-        round_prediction = round(prediction, 2)
-
-        return {
-            "status" : "success",
-            "prediction" : float(round_prediction)
+        # create the response 
+        n_readings = len(dataframe)
+        missing_fraction = {
+            col: float(dataframe[col].isna().mean()) for col in SENSOR
         }
+
+        warnings = [
+            f"Sensor {col} is null"
+            for col, frac in missing_fraction.items()
+            if frac == 1.0
+        ]
+
+        return ResponseModel(
+            predicted_yield = prediction,
+            n_readings= n_readings,
+            missing_fraction= missing_fraction,
+            warnings=warnings,
+            model_version=MODEL_VERSION
+        )
+    except InvalidError as exec:
+        raise HTTPException(
+            status_code = status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail = str(exec)
+        ) from exec 
     except HTTPException:
         raise 
     except Exception as e:
+        logger.exception("Error during Prediction")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail= "Connection Error"
